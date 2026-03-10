@@ -1,0 +1,65 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: itineraries
+// Document ID: auto-generated
+// Fields:
+//   - destination: string (required)
+//   - startDate: string (required, ISO date)
+//   - endDate: string (required, ISO date)
+//   - budget: string (required, economy|moderate|luxury)
+//   - interests: list (optional, strings)
+//   - content: string (required, markdown)
+//   - userId: string (required, owner UID)
+//   - createdAt: timestamp (required)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidItinerary(data) {
+      return data.destination is string && data.destination.size() > 0 && data.destination.size() < 200 &&
+             data.startDate is string && data.startDate.matches("^\\d{4}-\\d{2}-\\d{2}.*") &&
+             data.endDate is string && data.endDate.matches("^\\d{4}-\\d{2}-\\d{2}.*") &&
+             data.budget in ['economy', 'moderate', 'luxury'] &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 50000 &&
+             data.userId == request.auth.uid &&
+             (!('numericBudget' in data) || (data.numericBudget is string && data.numericBudget.size() < 50)) &&
+             (!('rating' in data) || (data.rating is number && data.rating >= 1 && data.rating <= 5)) &&
+             (!('feedback' in data) || (data.feedback is string && data.feedback.size() < 5000)) &&
+             data.createdAt is timestamp;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "barenokcy@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    match /itineraries/{itineraryId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidItinerary(request.resource.data);
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && isValidItinerary(request.resource.data);
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "AI Travel Planner",
+  "description": "Personalized AI-powered travel itineraries, attraction recommendations, and budget estimation.",
+  "requestFramePermissions": ["geolocation"]
+}
