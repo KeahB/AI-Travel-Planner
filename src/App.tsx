@@ -296,7 +296,7 @@ export default function App() {
             <span className={cn(
               "text-2xl font-extrabold tracking-tight transition-colors duration-300",
               isScrolled ? "text-slate-900" : "text-white"
-            )}>Vagabond<span className="text-brand-peach">AI</span></span>
+            )}>Vagabond<span className="text-brand-sunset">AI</span></span>
           </div>
 
           <div className="flex items-center gap-8">
@@ -378,7 +378,7 @@ export default function App() {
               Next-Gen Travel Planning
             </span>
             <h1 className="text-6xl md:text-9xl font-extrabold tracking-tighter text-white mb-8 leading-[0.85]">
-              Your Next <span className="font-serif italic font-normal text-brand-peach">Adventure</span>, <br />
+              Your Next <span className="font-serif italic font-normal text-brand-sunset">Adventure</span>, <br />
               Planned by AI.
             </h1>
             <p className="text-xl md:text-2xl text-slate-200 mb-12 max-w-2xl mx-auto leading-relaxed font-medium text-balance">
